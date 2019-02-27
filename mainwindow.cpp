@@ -10,7 +10,7 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     setWindowTitle(tr("Main Window"));
-    openAction = new QAction(QIcon(":/images/doc-open"), tr("&Open ..."), this);
+    openAction = new QAction(QIcon("../images/folder-open.png"), tr("&Open ..."), this);
     openAction->setShortcuts(QKeySequence::Open);
     openAction->setStatusTip(tr("Open File"));
     connect(openAction, &QAction::triggered, this, &MainWindow::open);
