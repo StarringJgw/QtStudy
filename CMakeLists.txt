@@ -8,7 +8,7 @@ set(CMAKE_AUTORCC ON)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 
-add_executable(QtClion main.cpp Newspaper.h Reader.h mainwindow.h mainwindow.cpp)
+add_executable(QtClion main.cpp mainwindow.h mainwindow.cpp)
 
 target_link_libraries(QtClion Qt5::Core)
 target_link_libraries(QtClion Qt5::Widgets)

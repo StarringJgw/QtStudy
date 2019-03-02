@@ -1,23 +1,21 @@
-//
-// Created by Jgw on 27/2/19.
-//
-
-#ifndef QTCLION_MAINWINDOW_H
-#define QTCLION_MAINWINDOW_H
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
 #include <QMainWindow>
 
+namespace Ui {
+    class MainWindow;
+}
+
 class MainWindow : public QMainWindow {
 Q_OBJECT
-public:
-    MainWindow(QWidget *parent = 0);
 
+public:
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
 private:
-    void open();
-    QAction *openAction;
-    QAction *closeAction;
+    Ui::MainWindow *ui;
 };
 
-#endif //QTCLION_MAINWINDOW_H
+#endif // MAINWINDOW_H
