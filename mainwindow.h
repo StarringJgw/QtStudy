@@ -16,8 +16,8 @@ public:
 
 private:
     void open();
-
     QAction *openAction;
+    QAction *closeAction;
 };
 
 #endif //QTCLION_MAINWINDOW_H

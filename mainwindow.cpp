@@ -15,8 +15,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     openAction->setStatusTip(tr("Open File"));
     connect(openAction, &QAction::triggered, this, &MainWindow::open);
 
+    closeAction = new QAction(tr("&Close"), this);
+    connect(closeAction, &QAction::triggered, this, &MainWindow::close);
+
     QMenu *file = menuBar()->addMenu(tr("&File"));
     file->addAction(openAction);
+
+    QMenu *close = menuBar()->addMenu(tr("&Close"));
+    close->addAction(closeAction);
 
     QToolBar *toolBar = addToolBar(tr("&File"));
     toolBar->addAction(openAction);
