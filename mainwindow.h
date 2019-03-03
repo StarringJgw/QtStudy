@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include "QDebug"
 #include "SatSolver/myList.h"
+#include "SatSolver/Dpll.h"
+#include "SatSolver/CnfParser.h"
 #include "SatSolver/SudokuSolver.h"
 #include "QGroupBox"
 namespace Ui {
@@ -22,9 +24,13 @@ public:
     void SubmitSudoku();
 
     void Cheat();
+
+    void SolveCnf();
 private:
     Ui::MainWindow *ui;
     SudokuSolver sudokuSolver;
+    CnfParser cnfParser;
+    SatSolver satSolver;
 };
 
 #endif // MAINWINDOW_H

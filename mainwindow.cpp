@@ -11,6 +11,8 @@
 #include <QIntValidator>
 #include "QDebug"
 #include "QMessageBox"
+#include "QFileDialog"
+#include "QFileInfo"
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent),
@@ -26,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QWidget *window = new QWidget(this);
     QGroupBox *sudokuBox = new QGroupBox;
     QGroupBox *cnfBox = new QGroupBox;
-    sudokuBox->setTitle("Sudoku");
+    sudokuBox->setTitle("Sudoku Solver @Jgw");
     for (int i1 = 0; i1 < 9; i1++) {
         for (int i2 = 0; i2 < 9; i2++) {
             QLineEdit *singleBox = new QLineEdit;
@@ -40,16 +42,18 @@ MainWindow::MainWindow(QWidget *parent) :
     QPushButton *initialSudoku = new QPushButton("Initial Sudoku");
     QPushButton *submitSudoku = new QPushButton("Submit Sudoku");
     QPushButton *cheat = new QPushButton("Cheat");
+    QPushButton *solveCnf = new QPushButton("Solve Cnf");
     submitSudoku->setEnabled(false);
     cheat->setEnabled(false);
     connect(initialSudoku, &QPushButton::clicked, this, &MainWindow::InitialSudoku);
     connect(submitSudoku, &QPushButton::clicked, this, &MainWindow::SubmitSudoku);
     connect(cheat, &QPushButton::clicked, this, &MainWindow::Cheat);
+    connect(solveCnf, &QPushButton::clicked, this, &MainWindow::SolveCnf);
 
     cnfLayout->addWidget(initialSudoku);
     cnfLayout->addWidget(submitSudoku);
     cnfLayout->addWidget(cheat);
-
+    cnfLayout->addWidget(solveCnf);
 
     cnfBox->setLayout(cnfLayout);
     sudokuBox->setLayout(sudokuLayout);
@@ -79,6 +83,8 @@ void MainWindow::InitialSudoku() {
     }
     buttons[1]->setEnabled(true);
     buttons[2]->setEnabled(true);
+    buttons[1]->repaint();
+    buttons[2]->repaint();
 }
 
 void MainWindow::SubmitSudoku() {
@@ -116,4 +122,29 @@ void MainWindow::Cheat() {
     }
     buttons[1]->setEnabled(true);
 
+}
+
+void MainWindow::SolveCnf() {
+    QString path = QFileDialog::getOpenFileName(this, tr("Open File"), "../", "(*.*)");
+    if (path.size() == 0)
+        return;
+//    qDebug()<<path;
+    QFileInfo fullFile = QFileInfo(path);
+//    cout << fullFile.path().toStdString()<<endl<<path.toStdString()<<endl<<fullFile.baseName().toStdString();
+    auto target = cnfParser.readCnf(fullFile.path().toStdString(), path.toStdString(),
+                                    fullFile.baseName().toStdString());
+    satSolver.Solve(target, cnfParser.symbolNum);
+    satSolver.OutputLog();
+    cnfParser.outputSolution(satSolver.status, satSolver.solution, satSolver.time);
+    if (satSolver.status == 1) {
+        QString message("Solved\nTimeOptimize(s): ");
+        message = message + QString::number(satSolver.timeOpt) + "\nTimeOrign(s): " + QString::number(satSolver.time) +
+                  "\nRate：" + QString::number((satSolver.time - satSolver.timeOpt) / satSolver.time) + "\n";
+        QMessageBox::information(this, tr("Answer"), message);
+    } else {
+        QString message("Not Solved\nTimeOptimize(s): ");
+        message = message + QString::number(satSolver.timeOpt) + "\nTimeOrign(s): " + QString::number(satSolver.time) +
+                  "\nRate：" + QString::number((satSolver.time - satSolver.timeOpt) / satSolver.time) + "\n";
+        QMessageBox::information(this, tr("Answer"), message);
+    }
 }
