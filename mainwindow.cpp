@@ -10,6 +10,7 @@
 #include "QList"
 #include <QIntValidator>
 #include "QDebug"
+#include "QMessageBox"
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent),
@@ -38,12 +39,16 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     QPushButton *initialSudoku = new QPushButton("Initial Sudoku");
     QPushButton *submitSudoku = new QPushButton("Submit Sudoku");
+    QPushButton *cheat = new QPushButton("Cheat");
     submitSudoku->setEnabled(false);
+    cheat->setEnabled(false);
     connect(initialSudoku, &QPushButton::clicked, this, &MainWindow::InitialSudoku);
     connect(submitSudoku, &QPushButton::clicked, this, &MainWindow::SubmitSudoku);
+    connect(cheat, &QPushButton::clicked, this, &MainWindow::Cheat);
 
     cnfLayout->addWidget(initialSudoku);
     cnfLayout->addWidget(submitSudoku);
+    cnfLayout->addWidget(cheat);
 
 
     cnfBox->setLayout(cnfLayout);
@@ -73,6 +78,7 @@ void MainWindow::InitialSudoku() {
         }
     }
     buttons[1]->setEnabled(true);
+    buttons[2]->setEnabled(true);
 }
 
 void MainWindow::SubmitSudoku() {
@@ -83,7 +89,7 @@ void MainWindow::SubmitSudoku() {
         }
     }
     QList<QLineEdit *> singleBoxes = this->centralWidget()->findChildren<QLineEdit *>();
-    for (int i = 80; i < 81; i++) {
+    for (int i = 0; i < 81; i++) {
         int temp = singleBoxes[i]->text().toInt();
         if (temp != 0) {
             *(playerSubmit[0] + i) = temp;
@@ -94,5 +100,19 @@ void MainWindow::SubmitSudoku() {
             sudokuSolver.playerBoard[i1][i2] = playerSubmit[i1][i2];
         }
     }
-    qDebug() << sudokuSolver.submit();
+    if (sudokuSolver.submit()) {
+        QMessageBox::information(this, tr("Answer"), tr("true"));
+    } else
+        QMessageBox::information(this, tr("Answer"), tr("false"));
+
+}
+
+void MainWindow::Cheat() {
+//    sudokuSolver.GenerateFinal();
+    QList<QLineEdit *> singleBoxes = this->centralWidget()->findChildren<QLineEdit *>();
+    QList<QPushButton *> buttons = this->centralWidget()->findChildren<QPushButton *>();
+    for (int i = 0; i < 81; i++) {
+        singleBoxes[i]->setText(QString::number(*(sudokuSolver.answerBoard[0] + i)));
+    }
+    buttons[1]->setEnabled(true);
 }

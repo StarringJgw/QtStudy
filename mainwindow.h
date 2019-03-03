@@ -20,6 +20,8 @@ public:
     void InitialSudoku();
 
     void SubmitSudoku();
+
+    void Cheat();
 private:
     Ui::MainWindow *ui;
     SudokuSolver sudokuSolver;
