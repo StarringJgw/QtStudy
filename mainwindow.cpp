@@ -115,4 +115,5 @@ void MainWindow::Cheat() {
         singleBoxes[i]->setText(QString::number(*(sudokuSolver.answerBoard[0] + i)));
     }
     buttons[1]->setEnabled(true);
+
 }
