@@ -6,6 +6,10 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QWidget>
+#include "QList"
+#include <QIntValidator>
+#include "QDebug"
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent),
@@ -29,11 +33,14 @@ MainWindow::MainWindow(QWidget *parent) :
             singleBox->setMaxLength(1);
 //            singleBox->setFocusPolicy(Qt::NoFocus);
             sudokuLayout->addWidget(singleBox, i1, i2);
+            singleBox->setValidator(new QIntValidator(1, 9, this));
         }
     }
     QPushButton *initialSudoku = new QPushButton("Initial Sudoku");
     QPushButton *submitSudoku = new QPushButton("Submit Sudoku");
+    submitSudoku->setEnabled(false);
     connect(initialSudoku, &QPushButton::clicked, this, &MainWindow::InitialSudoku);
+    connect(submitSudoku, &QPushButton::clicked, this, &MainWindow::SubmitSudoku);
 
     cnfLayout->addWidget(initialSudoku);
     cnfLayout->addWidget(submitSudoku);
@@ -52,5 +59,40 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::InitialSudoku() {
-    SudokuSolver sudokuSolver;
+    sudokuSolver.GenerateFinal();
+    QList<QLineEdit *> singleBoxes = this->centralWidget()->findChildren<QLineEdit *>();
+    QList<QPushButton *> buttons = this->centralWidget()->findChildren<QPushButton *>();
+    for (int i = 0; i < 81; i++) {
+        singleBoxes[i]->setEnabled(true);
+        int temp = *(sudokuSolver.playerBoard[0] + i);
+        if (temp != 0) {
+            singleBoxes[i]->setText(QString::number(temp));
+            singleBoxes[i]->setEnabled(false);
+        } else {
+            singleBoxes[i]->clear();
+        }
+    }
+    buttons[1]->setEnabled(true);
+}
+
+void MainWindow::SubmitSudoku() {
+    int playerSubmit[9][9];
+    for (int i1 = 0; i1 < 9; i1++) {
+        for (int i2 = 0; i2 < 9; i2++) {
+            playerSubmit[i1][i2] = 0;
+        }
+    }
+    QList<QLineEdit *> singleBoxes = this->centralWidget()->findChildren<QLineEdit *>();
+    for (int i = 80; i < 81; i++) {
+        int temp = singleBoxes[i]->text().toInt();
+        if (temp != 0) {
+            *(playerSubmit[0] + i) = temp;
+        }
+    }
+    for (int i1 = 0; i1 < 9; i1++) {
+        for (int i2 = 0; i2 < 9; i2++) {
+            sudokuSolver.playerBoard[i1][i2] = playerSubmit[i1][i2];
+        }
+    }
+    qDebug() << sudokuSolver.submit();
 }

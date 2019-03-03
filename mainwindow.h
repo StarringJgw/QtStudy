@@ -18,6 +18,8 @@ public:
     ~MainWindow();
 
     void InitialSudoku();
+
+    void SubmitSudoku();
 private:
     Ui::MainWindow *ui;
     SudokuSolver sudokuSolver;
