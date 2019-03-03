@@ -2,7 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-
+#include "QDebug"
+#include "SatSolver/myList.h"
+#include "SatSolver/SudokuSolver.h"
+#include "QGroupBox"
 namespace Ui {
     class MainWindow;
 }
@@ -14,8 +17,10 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void InitialSudoku();
 private:
     Ui::MainWindow *ui;
+    SudokuSolver sudokuSolver;
 };
 
 #endif // MAINWINDOW_H
