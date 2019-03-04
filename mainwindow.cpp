@@ -125,7 +125,7 @@ void MainWindow::Cheat() {
 }
 
 void MainWindow::SolveCnf() {
-    QString path = QFileDialog::getOpenFileName(this, tr("Open File"), "../", "(*.*)");
+    QString path = QFileDialog::getOpenFileName(this, tr("Open File"), "../", "(*)");
     if (path.size() == 0)
         return;
 //    qDebug()<<path;
@@ -134,6 +134,7 @@ void MainWindow::SolveCnf() {
     auto target = cnfParser.readCnf(fullFile.path().toStdString(), path.toStdString(),
                                     fullFile.baseName().toStdString());
     satSolver.Solve(target, cnfParser.symbolNum);
+    satSolver.adjust();
     satSolver.OutputLog();
     cnfParser.outputSolution(satSolver.status, satSolver.solution, satSolver.time);
     if (satSolver.status == 1) {
