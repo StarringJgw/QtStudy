@@ -13,6 +13,7 @@
 #include "QMessageBox"
 #include "QFileDialog"
 #include "QFileInfo"
+#include "QInputDialog"
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent),
@@ -61,6 +62,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mainLayout->addWidget(cnfBox, 0, 1);
     window->setLayout(mainLayout);
     setCentralWidget(window);
+    lastTime = 0;
 }
 
 MainWindow::~MainWindow() {
@@ -130,22 +132,37 @@ void MainWindow::SolveCnf() {
         return;
 //    qDebug()<<path;
     QFileInfo fullFile = QFileInfo(path);
+    int optType = QInputDialog::getInt(this, tr("Sat Solver"), tr("Choose Optimize Type"), QLineEdit::Normal, 0);
+    if (optType != 0 && optType != 1 && optType != 2)
+        return;
 //    cout << fullFile.path().toStdString()<<endl<<path.toStdString()<<endl<<fullFile.baseName().toStdString();
     auto target = cnfParser.readCnf(fullFile.path().toStdString(), path.toStdString(),
                                     fullFile.baseName().toStdString());
-    satSolver.Solve(target, cnfParser.symbolNum);
-    satSolver.adjust();
+    satSolver.Reset();
+    satSolver.Solve(target, cnfParser.symbolNum, optType);
+//    satSolver.adjust();
     satSolver.OutputLog();
     cnfParser.outputSolution(satSolver.status, satSolver.solution, satSolver.time);
     if (satSolver.status == 1) {
-        QString message("Solved\nTimeOptimize(s): ");
-        message = message + QString::number(satSolver.timeOpt) + "\nTimeOrign(s): " + QString::number(satSolver.time) +
-                  "\nRate：" + QString::number((satSolver.time - satSolver.timeOpt) / satSolver.time) + "\n";
+        QString message("Solved\nTime(s): ");
+        message = message + QString::number(satSolver.time);
+//        message = message + QString::number(satSolver.time) + "\nTimeOrign(s): " + QString::number(satSolver.time) +
+//                  "\nRate：" + QString::number((satSolver.time - satSolver.time) / satSolver.time) + "\n";
         QMessageBox::information(this, tr("Answer"), message);
     } else {
         QString message("Not Solved\nTimeOptimize(s): ");
-        message = message + QString::number(satSolver.timeOpt) + "\nTimeOrign(s): " + QString::number(satSolver.time) +
-                  "\nRate：" + QString::number((satSolver.time - satSolver.timeOpt) / satSolver.time) + "\n";
+        message = message + QString::number(satSolver.time);
+//        message = message + QString::number(satSolver.time) + "\nTimeOrign(s): " + QString::number(satSolver.time) +
+//                  "\nRate：" + QString::number((satSolver.time - satSolver.time) / satSolver.time) + "\n";
         QMessageBox::information(this, tr("Answer"), message);
+    }
+    if (lastTime != 0 && lastPath == path) {
+        QString message("Rate(Compared to last):\n");
+        message = message + QString::number((lastTime - satSolver.time) / lastTime);
+        QMessageBox::information(this, tr("Answer"), message);
+//        lastTime=0;
+    } else {
+        lastTime = satSolver.time;
+        lastPath = path;
     }
 }

@@ -31,6 +31,8 @@ private:
     SudokuSolver sudokuSolver;
     CnfParser cnfParser;
     SatSolver satSolver;
+    double lastTime;
+    QString lastPath;
 };
 
 #endif // MAINWINDOW_H
